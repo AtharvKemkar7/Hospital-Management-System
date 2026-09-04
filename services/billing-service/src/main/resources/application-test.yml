@@ -1,0 +1,27 @@
+# Test profile.
+spring:
+  datasource:
+    url: jdbc:h2:mem:billing_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        jdbc:
+          time_zone: UTC
+    open-in-view: false
+  flyway:
+    enabled: false
+
+app:
+  jwt:
+    secret: test-only-secret-test-only-secret-test-only-secret-test-only!!
+    issuer: healthcare-platform
+
+logging:
+  level:
+    com.healthcare.billing: INFO

@@ -1,0 +1,36 @@
+# Production profile. Activated by SPRING_PROFILES_ACTIVE=prod.
+#
+# HARD RULES enforced by JwtProperties when profile=prod:
+#   - JWT_SECRET MUST be provided and MUST be >= 32 bytes
+#   - DB credentials MUST be provided via env
+#
+# Kafka is NOT required to start. It is only contacted when
+# app.events.publish-enabled=true AND a Kafka broker is configured.
+
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+app:
+  events:
+    publish-enabled: ${AUTH_EVENTS_ENABLED:false}
+
+logging:
+  level:
+    com.healthcare.auth: INFO
+    root: INFO

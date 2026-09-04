@@ -1,0 +1,88 @@
+spring:
+  application:
+    name: auth-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: ${SERVER_PORT:8081}
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+    include-exception: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+  health:
+    db:
+      enabled: true
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  info:
+    env:
+      enabled: false
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+app:
+  jwt:
+    # HS256 secret. MUST be overridden in non-local profiles via env.
+    # 32+ bytes recommended. Local default is intentionally weak and only used
+    # when the active profile is `local`. See JwtProperties for enforcement.
+    secret: ${JWT_SECRET:change-me-please-change-me-please-change-me-please!!}
+    access-token-expiration-seconds: ${JWT_ACCESS_TOKEN_EXPIRATION_SECONDS:900}
+    refresh-token-expiration-seconds: ${JWT_REFRESH_TOKEN_EXPIRATION_SECONDS:1209600}
+    issuer: ${JWT_ISSUER:healthcare-platform}
+  security:
+    bcrypt-cost: 12
+    max-failed-login-attempts: 5
+    lockout-duration-minutes: 15
+  registration:
+    # Public registration is restricted to this single role. Privileged roles
+    # (DOCTOR, ADMIN, RECEPTIONIST, BILLING_STAFF) must be provisioned by an
+    # authenticated ADMIN through POST /api/v1/users.
+    public-role: PATIENT
+  events:
+    # If true and Kafka is reachable, domain events are published. If false
+    # or Kafka is unreachable, authentication still works — events are dropped
+    # with a warning log. Kafka itself is not required for Phase 1 to function.
+    publish-enabled: ${AUTH_EVENTS_ENABLED:false}
+    topic-user-registered: healthcare.auth.UserRegistered
+    topic-user-deactivated: healthcare.auth.UserDeactivated
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+  correlation:
+    header-name: X-Correlation-Id
+
+logging:
+  level:
+    root: INFO
+    com.healthcare.auth: INFO
+    org.springframework.security: INFO
+    org.flywaydb: INFO

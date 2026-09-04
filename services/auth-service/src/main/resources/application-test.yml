@@ -1,0 +1,41 @@
+# Test profile. Used by unit and slice tests that do NOT need a database.
+# Integration tests use Testcontainers and override the datasource programmatically.
+
+spring:
+  datasource:
+    # H2 is provided in test scope but we keep it disabled by default; the
+    # Testcontainers PostgreSQL container is started by IntegrationTestBase.
+    url: jdbc:h2:mem:auth_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        jdbc:
+          time_zone: UTC
+    open-in-view: false
+  flyway:
+    enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
+
+app:
+  jwt:
+    secret: test-only-secret-test-only-secret-test-only-secret-test-only!!
+    access-token-expiration-seconds: 900
+    refresh-token-expiration-seconds: 3600
+  security:
+    bcrypt-cost: 4
+    max-failed-login-attempts: 5
+    lockout-duration-minutes: 15
+  events:
+    publish-enabled: false
+  registration:
+    public-role: PATIENT
+  cors:
+    allowed-origins: http://localhost:4200

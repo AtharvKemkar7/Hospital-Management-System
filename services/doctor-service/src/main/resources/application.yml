@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: doctor-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: ${SERVER_PORT:8083}
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+    include-exception: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+  health:
+    db:
+      enabled: true
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  info:
+    env:
+      enabled: false
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+app:
+  jwt:
+    # HS256 secret. MUST match the auth-service. 32+ bytes recommended.
+    secret: ${JWT_SECRET:change-me-please-change-me-please-change-me-please!!}
+    issuer: ${JWT_ISSUER:healthcare-platform}
+
+logging:
+  level:
+    root: INFO
+    com.healthcare.doctor: INFO
+    org.springframework.security: INFO
+    org.flywaydb: INFO
